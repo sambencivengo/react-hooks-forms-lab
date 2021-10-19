@@ -1,32 +1,57 @@
-import React, { useState } from "react";
-import ItemForm from "./ItemForm";
-import Filter from "./Filter";
-import Item from "./Item";
+import React, { useState } from 'react';
+import ItemForm from './ItemForm';
+import Filter from './Filter';
+import Item from './Item';
 
 function ShoppingList({ items }) {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+	const [selectedCategory, setSelectedCategory] = useState('All');
+	const [filterSearch, setFilterSearch] = useState('');
+	const [itemsList, setItemsLIst] = useState(items);
+	console.log(itemsList);
 
-  function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
-  }
+	function handleFilterSearch(e) {
+		setFilterSearch(e.target.value);
+	}
 
-  const itemsToDisplay = items.filter((item) => {
-    if (selectedCategory === "All") return true;
+	function handleCategoryChange(e) {
+		setSelectedCategory(e.target.value);
+	}
 
-    return item.category === selectedCategory;
-  });
+	function handleAddItem(item) {
+		console.log(item);
+		setItemsLIst([item, ...itemsList]);
+	}
 
-  return (
-    <div className="ShoppingList">
-      <ItemForm />
-      <Filter onCategoryChange={handleCategoryChange} />
-      <ul className="Items">
-        {itemsToDisplay.map((item) => (
-          <Item key={item.id} name={item.name} category={item.category} />
-        ))}
-      </ul>
-    </div>
-  );
+	const itemsToDisplay = itemsList.filter((item) => {
+		if (selectedCategory === 'All') {
+			return true;
+		} else {
+			return item.category === selectedCategory;
+		}
+	});
+	console.log('first category filter: ', itemsToDisplay);
+	const filteredItemsToDisplay = itemsToDisplay.filter((item) => {
+		if (filterSearch === '') {
+			return true;
+		} else {
+			return item.name.toLowerCase() === filterSearch.toLowerCase();
+		}
+	});
+
+	return (
+		<div className="ShoppingList">
+			<ItemForm onItemFormSubmit={handleAddItem} />
+			<Filter
+				onSearchChange={handleCategoryChange}
+				search={handleFilterSearch}
+			/>
+			<ul className="Items">
+				{filteredItemsToDisplay.map((item) => (
+					<Item key={item.id} name={item.name} category={item.category} />
+				))}
+			</ul>
+		</div>
+	);
 }
 
 export default ShoppingList;
